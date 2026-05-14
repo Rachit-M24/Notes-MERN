@@ -4,13 +4,9 @@ import { createNote, deleteNote, getAllNotes, updateNote, updateNoteDetails } fr
 const router = express.Router();
 
 router.get("/", getAllNotes);
-
 router.post("/", createNote);
-
 router.put("/:id", updateNote);
-
 router.patch("/:id", updateNoteDetails);
-
 router.delete("/:id", deleteNote);
 
 export default router;
