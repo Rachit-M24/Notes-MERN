@@ -2,12 +2,17 @@ import { Note } from "../models/Note.js";
 
 export async function getAllNotes(req, res) {
   try {
-    const notes = await Note.find().sort({ createdAt: -1 }); //<- This will sort the notes in descending order based on the createdAt field
+    const notes = await Note.find().sort({ createdAt: -1 });
     res.status(200).json(notes);
+    
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch notes" });
+    console.error("GET NOTES ERROR:", error);
+    res.status(500).json({
+      error: error.message
+    });
   }
 }
+
 
 export async function createNote(req, res) {
   try {
@@ -15,6 +20,7 @@ export async function createNote(req, res) {
     const note = await Note.create({ title, content });
     res.status(201).json(note);
   } catch (error) {
+    console.error("CREATE NOTE ERROR:", error);
     res.status(500).json({ error: "Failed to create note" });
   }
 }
