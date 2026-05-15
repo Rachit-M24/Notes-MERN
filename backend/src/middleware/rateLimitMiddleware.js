@@ -1,4 +1,4 @@
-import rateLimitConfig from "../config/upsash.js";
+import rateLimitConfig from "../config/upstash.js";
 
 const rateLimitMiddleware = async (req, res, next) => {
   const { success } = await rateLimitConfig.limit(req.ip);

@@ -7,13 +7,13 @@ const noteSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
-      error: "Please provide a title for the note",
+      required: [true, "Please provide a title for the note"],
+      trim: true,
     },
     content: {
       type: String,
-      required: true,
-      error: "Please provide content for the note",
+      required: [true, "Please provide content for the note"],
+      trim: true,
     },
   },
 
