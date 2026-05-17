@@ -1,27 +1,5 @@
 import { Note } from "../models/Note.js";
 
-function buildNoteData(body) {
-  const { title, content } = body;
-
-  const noteData = {};
-
-  if (typeof title === "string") {
-    const normalizedTitle = title.trim();
-    if (normalizedTitle) {
-      noteData.title = normalizedTitle;
-    }
-  }
-
-  if (typeof content === "string") {
-    const normalizedContent = content.trim();
-    if (normalizedContent) {
-      noteData.content = normalizedContent;
-    }
-  }
-
-  return noteData;
-}
-
 export async function getAllNotes(req, res) {
   try {
     const notes = await Note.find().sort({ createdAt: -1 });
@@ -77,6 +55,7 @@ export async function updateNote(req, res) {
     res.status(500).json({ error: "Failed to update note" });
   }
 }
+
 export async function updateNoteDetails(req, res) {
   try {
     const { id } = req.params;
@@ -115,5 +94,91 @@ export async function deleteNote(req, res) {
     res.status(200).json({ message: "Note deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete note" });
+  }
+}
+
+function buildNoteData(body) {
+  const { title, content } = body;
+
+  const noteData = {};
+
+  if (typeof title === "string") {
+    const normalizedTitle = title.trim();
+    if (normalizedTitle) {
+      noteData.title = normalizedTitle;
+    }
+  }
+
+  if (typeof content === "string") {
+    const normalizedContent = content.trim();
+    if (normalizedContent) {
+      noteData.content = normalizedContent;
+    }
+  }
+
+  return noteData;
+}
+  
+export async function GetWithPagination(req, res) {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+      searchTerm = "",
+    } = req.query;
+
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+    const order = sortOrder === "asc" ? 1 : -1;
+
+    const searchFilter = searchTerm
+      ? {
+          $or: [
+            {
+              title: {
+                $regex: searchTerm,
+                $options: "i",
+              },
+            },
+            {
+              content: {
+                $regex: searchTerm,
+                $options: "i",
+              },
+            },
+          ],
+        }
+      : {};
+
+    const totalRecords = await Note.countDocuments(searchFilter);
+
+    const totalPages = Math.ceil(totalRecords / limitNumber);
+
+    const notes = await Note.find(searchFilter)
+      .sort({ [sortBy]: order })
+      .skip(skip)
+      .limit(limitNumber);
+
+    res.status(200).json({
+      data: notes,
+
+      pagination: {
+        currentPage: pageNumber,
+        limit: limitNumber,
+        totalRecords,
+        totalPages,
+        hasNextPage: pageNumber < totalPages,
+        hasPreviousPage: pageNumber > 1,
+      },
+    });
+  } catch (error) {
+    console.error("GET NOTES WITH PAGINATION ERROR:", error);
+
+    res.status(500).json({
+      error: "Failed to fetch notes with pagination",
+    });
   }
 }

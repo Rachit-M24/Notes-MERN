@@ -5,11 +5,13 @@ import {
   getAllNotes,
   updateNote,
   updateNoteDetails,
+  GetWithPagination
 } from "../controllers/notesController.js";
 
 const notesRouter = express.Router();
 
 notesRouter.get("/", getAllNotes);
+notesRouter.get("/GetWithPagination", GetWithPagination);
 notesRouter.post("/", createNote);
 notesRouter.put("/:id", updateNote);
 notesRouter.patch("/:id", updateNoteDetails);

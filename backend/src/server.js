@@ -4,15 +4,26 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import notesRouter from "./routes/notesRouter.js";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: process.env.APP_BASE_URL,
+    methods: [process.env.CORS_METHODS],
+    credentials: false,
+  }),
+);
+
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
+
 app.use(errorMiddleware);
 app.use(rateLimitMiddleware);
 app.use("/api/notes", notesRouter);
